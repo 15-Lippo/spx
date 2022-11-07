@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import {
     Stack, HStack, 
     SimpleGrid, 
@@ -8,7 +8,10 @@ import {
     Skeleton,
     Alert, AlertIcon, Spinner, Center,
 } from '@chakra-ui/react'
-import { getFriktionVolts } from '@/utils/getFriktionVolts'
+import { AnchorProvider } from '@project-serum/anchor'
+import { Connection } from '@solana/web3.js'
+import { FriktionSDK, VoltSDK } from '@friktion-labs/friktion-sdk'
+import MockWallet from '@/context/Anchor/MockWallet'
 
 const FilterToggle = React.lazy(() => import('./FilterToggle'))
 const MarketCard = React.lazy(() => import('./MarketCard'))
@@ -22,9 +25,7 @@ const gradientBackgroundStyle = {
 }
 // Style config //
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
-const categories = ['Shorts Options', 'Principal Protection', 'Entropy']
+const categories = ['Covered Calls', 'Cash Secured Puts', 'Basis', 'Capital Protection']
 
 // TODO: 1. add createMarket button/modal for admin
 //  2. Search bar
@@ -32,12 +33,43 @@ const categories = ['Shorts Options', 'Principal Protection', 'Entropy']
 const MarketList: any = () => {
     // FilterToggle state management is be ignored for the time being
     const { value, getCheckboxProps } = useCheckboxGroup({ defaultValue: [] })
+    const [volts, setVolts] = useState<any>([])
 
-    const volts = useMemo(() => {
+    const PROVIDER_URL = "https://friktion.rpcpool.com/07afafb9df9b278fb600cadb4111"
+    const provider = new AnchorProvider(
+      new Connection(PROVIDER_URL),
+      MockWallet,
+      {}
+    )
+    const friktionSdk = new FriktionSDK({
+      provider: provider,
+      // network: "devnet",
+      network: "mainnet-beta",
+    })
+
+    useEffect(() => {
+        const getFriktionVolts = async () => {
+            const voltVaults = await friktionSdk.getAllVoltsInSnapshot()
+
+            setVolts(voltVaults[0].sdk.snapshot?.allMainnetVolts)
+        }
         getFriktionVolts()
+            .catch(console.error)
     }, [])
-    console.log(volts)
+    console.log("volts", volts)
 
+    for (let i = 0; i < volts.length; i++) {
+        if (volts[i].globalId.includes("call")) {
+            volts[i]["category"] = 'Covered Calls'
+        } else if (volts[i].globalId.includes("put")) {
+            volts[i]["category"] = 'Cash Secured Puts'
+        } else if (volts[i].globalId.includes("basis")) {
+            volts[i]["category"] = 'basis'
+        } else if (volts[i].globalId.includes("protection")) {
+            volts[i]["category"] = 'Capital Protection'
+        }
+    }
+    
     if (!volts) {
         return (
             <Alert status='error' rounded={'lg'}>
@@ -47,10 +79,11 @@ const MarketList: any = () => {
         )
     }
 
-    let filteredMarkets = []
-    // if (volts) {
-    //     filteredMarkets = volts.filter(({ category }) => value.includes(category))
-    // }
+    let filteredVolts = []
+    if (volts) {
+        filteredVolts = volts.filter(({ category }) => value.includes(category))
+    }
+    console.log("filteredVolts", filteredVolts)
     
     return (
         <Box>
@@ -74,11 +107,18 @@ const MarketList: any = () => {
                 </Center>
             }>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
-                        {volts.map((volt: any) => (
+                    {filteredVolts.length != 0 ?
+                        (filteredVolts.map((volt: any) => (
                             <Stack key={volt.voltKey}>
                                 <MarketCard volt={volt} />
                             </Stack>
-                        ))}
+                        )))
+                        : (volts && volts.map((volt: any) => (
+                            <Stack key={volt.voltKey}>
+                                <MarketCard volt={volt} />
+                            </Stack>
+                        )))
+                    }
                 </SimpleGrid>
             </Suspense>
 

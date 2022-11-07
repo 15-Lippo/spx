@@ -42,25 +42,19 @@ const Home: NextPage = () => {
                   as={'span'}
                   position={'relative'}
                 >
-                  Trade
+                  Friktion
                 </Text>
                 <Text
                   as={'span'}
                   position={'relative'}
                   color={'gray.500'}
                 >
-                  &nbsp;directly
+                  &nbsp;SDK Challenge
                 </Text>
                 <br />
-                <Text as={'span'} color={'gray.500'}>
-                  on the outcome of
-                </Text>
-                <Text as={'span'}>
-                  &nbsp;events.
-                </Text>
               </Heading>
               <Text color={mode('gray.500', 'gray.200')} fontSize={{ base: 'xl', md: '2xl' }}>
-                A commodity derivative powered by automated market makers.
+                A very superficial view of Friktion volts
               </Text>
               
             <MarketList />
