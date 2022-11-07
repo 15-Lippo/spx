@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import {
     Stack, HStack, 
     SimpleGrid, 
@@ -8,7 +8,7 @@ import {
     Skeleton,
     Alert, AlertIcon, Spinner, Center,
 } from '@chakra-ui/react'
-import useSWR from 'swr'
+import { getFriktionVolts } from '@/utils/getFriktionVolts'
 
 const FilterToggle = React.lazy(() => import('./FilterToggle'))
 const MarketCard = React.lazy(() => import('./MarketCard'))
@@ -24,32 +24,34 @@ const gradientBackgroundStyle = {
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
-const categories = ['Financials', 'Economics', 'Crypto', 'Climate']
+const categories = ['Shorts Options', 'Principal Protection', 'Entropy']
 
 // TODO: 1. add createMarket button/modal for admin
 //  2. Search bar
 
 const MarketList: any = () => {
-    const { data, error } = useSWR('/api/fetchMarkets', fetcher)
-    
     // FilterToggle state management is be ignored for the time being
     const { value, getCheckboxProps } = useCheckboxGroup({ defaultValue: [] })
 
-    if (!data) return
-    if (error) {
+    const volts = useMemo(() => {
+        getFriktionVolts()
+    }, [])
+    console.log(volts)
+
+    if (!volts) {
         return (
             <Alert status='error' rounded={'lg'}>
                 <AlertIcon mr={4} />
-                An error has occured loading markets.            
+                An error has occured loading Friktion volts.            
             </Alert>
         )
     }
 
     let filteredMarkets = []
-    if (data) {
-        filteredMarkets = data.filter(({ category }) => value.includes(category))
-    }
-
+    // if (volts) {
+    //     filteredMarkets = volts.filter(({ category }) => value.includes(category))
+    // }
+    
     return (
         <Box>
             <HStack py={5}>
@@ -72,18 +74,11 @@ const MarketList: any = () => {
                 </Center>
             }>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
-                    {filteredMarkets.length != 0 ?
-                        (filteredMarkets.map((market: any) => (
-                            <Stack key={market.marketId}>
-                                <MarketCard market={market} />
+                        {volts.map((volt: any) => (
+                            <Stack key={volt.voltKey}>
+                                <MarketCard volt={volt} />
                             </Stack>
-                        )))
-                        : (data && data.map((market: any) => (
-                            <Stack key={market.marketId}>
-                                <MarketCard market={market} />
-                            </Stack>
-                        )))
-                    }
+                        ))}
                 </SimpleGrid>
             </Suspense>
 

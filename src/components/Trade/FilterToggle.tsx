@@ -55,9 +55,9 @@ export const FilterToggle = (props: ToggleButtonProps) => {
       <ToggleButton {...getCheckboxProps()} id={id}>
         <HStack spacing={1}>
           {/* change icon filter based on toggle checked state */}
-          <Image src={iconUrl} alt={title} width={{ 'base':'11px', 'md':'15px' }} 
+          {/* <Image src={iconUrl} alt={title} width={{ 'base':'11px', 'md':'15px' }} 
               sx={state.isChecked ? toggledIcon : notToggledIcon}
-          />
+          /> */}
           
           <Box>
             <Text fontSize={{'base':'10px', 'md': 'sm'}} fontWeight="bold">{title}</Text>

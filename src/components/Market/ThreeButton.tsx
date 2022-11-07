@@ -24,60 +24,63 @@ export default function ThreeButton() {
 
     return (
         <MotionConfig transition={transition}>
-        <motion.button
-            className={styles.threeButton}
-            ref={ref}
-            initial={false}
-            animate={isHover ? "hover" : "rest"}
-            whileTap="press"
-            variants={{
-            rest: { scale: 1 },
-            hover: { scale: 1.2 },
-            press: { scale: 1.1 }
-            }}
-            onHoverStart={() => {
-            resetMousePosition()
-            setIsHover(true)
-            }}
-            onHoverEnd={() => {
-            resetMousePosition()
-            setIsHover(false)
-            }}
-            onTapStart={() => setIsPress(true)}
-            onTap={() => setIsPress(false)}
-            onTapCancel={() => setIsPress(false)}
-            onPointerMove={(e) => {
-            mouseX.set(e.clientX - bounds.x - bounds.width / 2)
-            mouseY.set(e.clientY - bounds.y - bounds.height / 2)
-            }}
-        >
-            <motion.div
-            className={styles.shapes}
-            variants={{
-                rest: { opacity: 0 },
-                hover: { opacity: 1 }
-            }}
+            <motion.button
+                className={styles.threeButton}
+                ref={ref}
+                initial={false}
+                animate={isHover ? "hover" : "rest"}
+                whileTap="press"
+                variants={{
+                    rest: { scale: 1 },
+                    hover: { scale: 1.05 },
+                    press: { scale: 1.1 }
+                }}
+                onHoverStart={() => {
+                    resetMousePosition()
+                    setIsHover(true)
+                }}
+                onHoverEnd={() => {
+                    resetMousePosition()
+                    setIsHover(false)
+                }}
+                onTapStart={() => setIsPress(true)}
+                onTap={() => setIsPress(false)}
+                onTapCancel={() => setIsPress(false)}
+                onPointerMove={(e) => {
+                    mouseX.set(e.clientX - bounds.x - bounds.width / 2)
+                    mouseY.set(e.clientY - bounds.y - bounds.height / 2)
+                }}
+                onClick={(e) => {
+                    
+                }}
             >
-            <div className={styles.pinkBlush} />
-            <div className={styles.blueBlush} />
-            <div className={styles.shapesContainer}>
-                <Suspense fallback={null}>
-                <Shapes
-                    isHover={isHover}
-                    isPress={isPress}
-                    mouseX={mouseX}
-                    mouseY={mouseY}
-                />
-                </Suspense>
-            </div>
-            </motion.div>
-            <motion.div
-                variants={{ hover: { scale: 0.85 }, press: { scale: 1.1 } }}
-                className={styles.shapesLabel}
-            >
-                Place order
-            </motion.div>
-        </motion.button>
+                <motion.div
+                    className={styles.shapes}
+                    variants={{
+                        rest: { opacity: 0 },
+                        hover: { opacity: 1 }
+                    }}
+                >
+                <div className={styles.pinkBlush} />
+                <div className={styles.blueBlush} />
+                <div className={styles.shapesContainer}>
+                    <Suspense fallback={null}>
+                        <Shapes
+                            isHover={isHover}
+                            isPress={isPress}
+                            mouseX={mouseX}
+                            mouseY={mouseY}
+                        />
+                    </Suspense>
+                </div>
+                </motion.div>
+                <motion.div
+                    variants={{ hover: { scale: 0.9 }, press: { scale: 1.05 } }}
+                    className={styles.shapesLabel}
+                >
+                    Place order
+                </motion.div>
+            </motion.button>
         </MotionConfig>
     )
 }
@@ -88,28 +91,28 @@ export function Shapes({ isHover, isPress, mouseX, mouseY }) {
 
     return (
         <Canvas shadows dpr={[1, 2]} resize={{ scroll: false, offsetSize: true }}>
-        <Camera mouseX={mouseX} mouseY={mouseY} />
-        <MotionConfig transition={transition}>
-            <motionThree.group
-                center={[0, 0, 0]}
-                rotation={[lightRotateX, lightRotateY, 0]}
-            >
-            <Lights />
-            </motionThree.group>
-            <motionThree.group
-                initial={false}
-                animate={isHover ? "hover" : "rest"}
-                dispose={null}
-                variants={{
-                    hover: { z: isPress ? -0.9 : 0 }
-                }}
-            >
-            <Sphere />
-            <Cone />
-            <Torus />
-            <Icosahedron />
-            </motionThree.group>
-        </MotionConfig>
+            <Camera mouseX={mouseX} mouseY={mouseY} />
+            <MotionConfig transition={transition}>
+                <motionThree.group
+                    center={[0, 0, 0]}
+                    rotation={[lightRotateX, lightRotateY, 0]}
+                >
+                    <Lights />
+                </motionThree.group>
+                <motionThree.group
+                    initial={false}
+                    animate={isHover ? "hover" : "rest"}
+                    dispose={null}
+                    variants={{
+                        hover: { z: isPress ? -0.9 : 0 }
+                    }}
+                >
+                    <Sphere />
+                    <Cone />
+                    <Torus />
+                    <Icosahedron />
+                </motionThree.group>
+            </MotionConfig>
         </Canvas>
     )
 }
@@ -130,8 +133,8 @@ export function Lights() {
 export function Sphere() {
     return (
         <motionThree.mesh position={[-0.5, -0.5, 0]} variants={{ hover: { z: 2 } }}>
-        <motionThree.sphereGeometry args={[0.4]} />
-        <Material />
+            <motionThree.sphereGeometry args={[0.4]} />
+            <Material />
         </motionThree.mesh>
     )
 }
@@ -143,15 +146,15 @@ export function Cone() {
             rotation={[-0.5, 0, -0.3]}
             variants={{
                 hover: {
-                z: 1.1,
-                x: -1.5,
-                rotateX: -0.2,
-                rotateZ: 0.4
+                    z: 1.1,
+                    x: -1.5,
+                    rotateX: -0.2,
+                    rotateZ: 0.4
                 }
             }}
         >
-        <motionThree.coneGeometry args={[0.3, 0.6, 20]} />
-        <Material />
+            <motionThree.coneGeometry args={[0.3, 0.6, 20]} />
+            <Material />
         </motionThree.mesh>
     )
 }
@@ -159,18 +162,18 @@ export function Cone() {
 export function Torus() {
     return (
         <motionThree.mesh
-        position={[0.1, 0.4, 0]}
-        rotation={[-0.5, 0.5, 0]}
-        variants={{
-            hover: {
-            y: 0.5,
-            z: 2,
-            rotateY: -0.2
-            }
-        }}
+            position={[0.1, 0.4, 0]}
+            rotation={[-0.5, 0.5, 0]}
+            variants={{
+                hover: {
+                    y: 0.5,
+                    z: 2,
+                    rotateY: -0.2
+                }
+            }}
         >
-        <motionThree.torusGeometry args={[0.2, 0.1, 10, 50]} />
-        <Material />
+            <motionThree.torusGeometry args={[0.2, 0.1, 10, 50]} />
+            <Material />
         </motionThree.mesh>
     )
 }
@@ -189,8 +192,8 @@ export function Icosahedron() {
                 }
             }}
         >
-        <motionThree.icosahedronGeometry args={[0.7, 0]} />
-        <Material />
+            <motionThree.icosahedronGeometry args={[0.7, 0]} />
+            <Material />
         </motionThree.mesh>
     )
 }

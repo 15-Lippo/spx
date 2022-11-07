@@ -109,13 +109,13 @@ async function main() {
         sellerPk = sellerKp.publicKey
 
         buyerAccountPk = (await getOrCreateAssociatedTokenAccount(
-            provider.provider.connection,
+            provider.connection,
             kp,
             escrowMintPk,
             buyerPk
         )).address
         sellerAccountPk = (await getOrCreateAssociatedTokenAccount(
-            provider.provider.connection,
+            provider.connection,
             kp,
             escrowMintPk,
             sellerPk
@@ -237,119 +237,6 @@ async function main() {
     await test(settle)
     await test(collect)
     await test(fetchBinaryOption)
-}
-
-export async function trade(
-    kp: Keypair,
-    poolPk: PublicKey,
-    escrowPk: PublicKey,
-    escrowMintPk: PublicKey,
-    longTokenMintPk: PublicKey,
-    shortTokenMintPk: PublicKey,
-    escrowAuthorityPk: PublicKey,
-) {
-    const binaryOptionProgram = splBinaryOptionProgram({
-        provider,
-        programId: SPL_BINARY_OPTION_PROGRAM_ID,
-    })
-    const tokenProgram = splTokenProgram({
-        provider,
-        programId: TOKEN_PROGRAM_ID,
-    })
-    const buyerKp = new Keypair()
-    const sellerKp = new Keypair()
-
-    const buyerPk = buyerKp.publicKey
-    const sellerPk = sellerKp.publicKey
-
-    const buyerAccountPk = (await getOrCreateAssociatedTokenAccount(
-        provider.connection,
-        kp,
-        escrowMintPk,
-        buyerPk
-    )).address
-    const sellerAccountPk = (await getOrCreateAssociatedTokenAccount(
-        provider.connection,
-        kp,
-        escrowMintPk,
-        sellerPk
-    )).address
-    const buyerLongTokenAccountPk = (await getOrCreateAssociatedTokenAccount(
-        provider.connection,
-        kp,
-        longTokenMintPk,
-        buyerPk
-    )).address
-    const buyerShortTokenAccountPk = (await getOrCreateAssociatedTokenAccount(
-        provider.connection,
-        kp,
-        shortTokenMintPk,
-        buyerPk
-    )).address
-    const sellerLongTokenAccountPk = (await getOrCreateAssociatedTokenAccount(
-        provider.connection,
-        kp,
-        longTokenMintPk,
-        sellerPk
-    )).address
-    const sellerShortTokenAccountPk = (await getOrCreateAssociatedTokenAccount(
-        provider.connection,
-        kp,
-        shortTokenMintPk,
-        sellerPk
-    )).address
-
-    const size = 10
-    const buyPrice = 30
-    const sellPrice = 70
-    const buyAmount = size * buyPrice
-    const sellAmount = size * sellPrice
-    const transaction = new Transaction()
-    
-    const mintBuyerIx = await tokenProgram.methods
-        .mintTo(new BN(buyAmount))
-        .accounts({
-            account: buyerAccountPk,
-            mint: escrowMintPk,
-            owner: kp.publicKey,
-        })
-        .instruction()
-    transaction.add(mintBuyerIx)
-
-    const mintSellerIx = await tokenProgram.methods
-        .mintTo(new BN(sellAmount))
-        .accounts({
-            account: sellerAccountPk,
-            mint: escrowMintPk,
-            owner: kp.publicKey,
-        })
-        .instruction()
-    transaction.add(mintSellerIx)
-
-    const tradeIx = await binaryOptionProgram.methods
-        .trade(new BN(size), new BN(buyPrice), new BN(sellPrice))
-        .accounts({
-            poolAccount: poolPk,
-            escrowAccount: escrowPk,
-            longTokenMint: longTokenMintPk,
-            shortTokenMint: shortTokenMintPk,
-            buyer: buyerPk,
-            seller: sellerPk,
-            buyerAccount: buyerAccountPk,
-            sellerAccount: sellerAccountPk,
-            buyerLongTokenAccount: buyerLongTokenAccountPk,
-            buyerShortTokenAccount: buyerShortTokenAccountPk,
-            sellerLongTokenAccount: sellerLongTokenAccountPk,
-            sellerShortTokenAccount: sellerShortTokenAccountPk,
-            escrowAuthority: escrowAuthorityPk,
-            tokenProgram: tokenProgram.programId,
-        })
-        .signers([kp, buyerKp, sellerKp])
-        .instruction()
-    transaction.add(tradeIx)
-
-    const signature = await sendAndConfirmTransaction(provider.connection, transaction, [kp, buyerKp, sellerKp])
-    console.log("Trade tx: ", signature)
 }
 
 main()
