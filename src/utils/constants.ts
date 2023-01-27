@@ -51,7 +51,7 @@ export const tokenAccountPool = new Web3.PublicKey(
 );
 
 export const feeAccount = new Web3.PublicKey(
-  "EY4hgx73saq9xuLr85HNaxGMAK6R5TkvuSDchKbpt291"
+  "EXb33uREbFZDQs6RKsYDAWmztGMGc2wJfraCNnhQcLVV"
 );
 
 export const kryptMint = new Web3.PublicKey(
