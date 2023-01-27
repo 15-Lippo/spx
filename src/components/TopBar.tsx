@@ -74,7 +74,7 @@ export default function WithSubnavigation() {
             fontFamily={"heading"}
             color={useColorModeValue("gray.800", "white")}
           >
-            Pascal
+            Lisprocoin by Pascal
           </Text>
         </Flex>
 
